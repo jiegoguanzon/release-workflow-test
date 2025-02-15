@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.0-rc.1](https://github.com/jiegoguanzon/release-workflow-test/compare/v0.1.0-rc.0...v0.1.0-rc.1) (2025-02-15)
+
+### Features
+
+* add text file ([e73d37c](https://github.com/jiegoguanzon/release-workflow-test/commit/e73d37c0e4084d78d075d3935eb8cdd2810c7add))
+
 ## 0.1.0-rc.0 (2025-02-15)
 
 ### Features
