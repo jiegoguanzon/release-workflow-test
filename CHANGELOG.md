@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.1.0](https://github.com/jiegoguanzon/release-workflow-test/compare/v0.1.0-rc.1...v0.1.0) (2025-02-15)
+
 ## [0.1.0-rc.1](https://github.com/jiegoguanzon/release-workflow-test/compare/v0.1.0-rc.0...v0.1.0-rc.1) (2025-02-15)
 
 ### Features
