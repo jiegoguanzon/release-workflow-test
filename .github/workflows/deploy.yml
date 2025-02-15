@@ -48,8 +48,32 @@ jobs:
           echo "$VERSION"
           echo "release_version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      # - id: release_rc
-      #   name: Release RC
-      #   run: npm run release -- --ci --preRelease=rc
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - id: release_rc
+        name: Release RC
+        run: npm run release -- --ci --preRelease=rc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    runs-on: ubuntu-24.04
+    needs:
+      - release_rc
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - id: checkout
+        name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.release_rc.outputs.release_version }}
+      
+      - id: echo
+        name: Echo
+        run: |-
+          echo "$RC_RELEASE_VERSION"
+          git branch --show-current
+          ls -al
+        env:
+          RC_RELEASE_VERSION: v${{ needs.release_rc.outputs.release_version }}

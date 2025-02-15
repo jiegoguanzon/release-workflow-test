@@ -23,7 +23,7 @@
     "push": true,
     "commitMessage": "chore: release v${version}",
     "tagName": "v${version}",
-    "pushArgs": ["-o", "ci.skip"]
+    "pushArgs": ["-o", "ci.skip", "--follow-tags"]
   },
   "github": {
     "release": false
