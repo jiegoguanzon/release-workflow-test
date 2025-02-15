@@ -14,6 +14,8 @@ jobs:
   release_rc:
     name: Release RC
     runs-on: ubuntu-24.04
+    environment:
+      name: staging
     outputs:
       release_version: ${{ steps.get_release_version.outputs.release_version }}
     permissions:
@@ -24,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: git config
         run: |
           git config user.name "${GITHUB_ACTOR}"
@@ -77,3 +79,55 @@ jobs:
           ls -al
         env:
           RC_RELEASE_VERSION: v${{ needs.release_rc.outputs.release_version }}
+
+  release:
+    name: Release
+    runs-on: ubuntu-24.04
+    needs:
+      - build
+      - release_rc
+    environment:
+      name: production
+    outputs:
+      release_version: ${{ steps.get_release_version.outputs.release_version }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: git config
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          echo "$GITHUB_REF_NAME"
+          git pull
+          git tag
+          ls -al
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
+        run: npm audit signatures
+
+      - id: get_release_version
+        name: Get Release Version
+        run: |
+          VERSION=$(npm run release -- --release-version | tail -1)
+          echo "$VERSION"
+          echo "release_version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - id: release
+        name: Release
+        run: npm run release -- --ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
