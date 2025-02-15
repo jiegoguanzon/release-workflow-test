@@ -1,0 +1,55 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release_rc:
+    name: Release RC
+    runs-on: ubuntu-24.04
+    outputs:
+      release_version: ${{ steps.get_release_version.outputs.release_version }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: git config
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm clean-install
+
+      - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
+        run: npm audit signatures
+
+      - id: get_release_version
+        name: Get Release Version
+        run: |
+          VERSION=$(npm run release -- --release-version --preRelease=rc | tail -1)
+          echo "$VERSION"
+          echo "release_version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      # - id: release_rc
+      #   name: Release RC
+      #   run: npm run release -- --ci --preRelease=rc
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
