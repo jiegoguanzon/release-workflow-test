@@ -27,7 +27,7 @@
     "pushArgs": ["-o", "ci.skip", "--follow-tags"]
   },
   "github": {
-    "release": false
+    "release": true
   },
   "npm": false
 }
